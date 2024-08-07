@@ -1,39 +1,41 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import { Feather } from '@expo/vector-icons'
+import { Feather } from "@expo/vector-icons"
 
 import Login from "../screens/auth/Login"
 import Register from "../screens/auth/Register"
-import ForgetPassword from '../screens/auth/ForgetPassword'
+import ForgetPassword from "../screens/auth/ForgetPassword"
+import ConfirmEmail from "../screens/auth/ConfirmEmail"
+import ResetPassword from "../screens/auth/ResetPassword"
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
 
 function AuthTabs() {
-    return (
-      <Tab.Navigator screenOptions={{ headerShown: false }}>
-        <Tab.Screen
-          name="Login"
-          component={Login}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Feather name="log-in" color={color} size={size} />
-            ),
-            tabBarLabel: 'Login'
-          }}
-        />
-        <Tab.Screen
-          name="Register"
-          component={Register}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Feather name="user-plus" color={color} size={size} />
-            ),
-            tabBarLabel: 'Register'
-          }}
-        />
-      </Tab.Navigator>
-    );
+  return (
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen
+        name="Login"
+        component={Login}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="log-in" color={color} size={size} />
+          ),
+          tabBarLabel: "Login",
+        }}
+      />
+      <Tab.Screen
+        name="Register"
+        component={Register}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="user-plus" color={color} size={size} />
+          ),
+          tabBarLabel: "Register",
+        }}
+      />
+    </Tab.Navigator>
+  )
 }
 
 export default function AuthRoutes() {
@@ -44,15 +46,22 @@ export default function AuthRoutes() {
         component={AuthTabs}
         options={{ headerShown: false }}
       />
+
       <Stack.Screen
         name="ForgetPassword"
         component={ForgetPassword}
-        options={{ title: '' }}
+        options={{ title: "" }}
+      />
+      <Stack.Screen
+        name="ResetPassword"
+        component={ResetPassword}
+        options={{ title: "" }}
+      />
+      <Stack.Screen
+        name="ConfirmEmail"
+        component={ConfirmEmail}
+        options={{ title: "" }}
       />
     </Stack.Navigator>
-  );
-}
-
-function createStackNavigator() {
-    throw new Error("Function not implemented.")
+  )
 }

@@ -2,117 +2,113 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { useDispatch, useSelector } from "react-redux"
 import { useEffect, useState } from "react"
-import { Feather } from '@expo/vector-icons'
-import axios from 'axios'
-import * as SecureStore from 'expo-secure-store'
+import { Feather } from "@expo/vector-icons"
+import axios from "axios"
+import * as SecureStore from "expo-secure-store"
 import AuthRoutes from "./auth.routes"
 
 import Feed from "../screens/Feed"
-import UserInfo from '../screens/User/UserInfo'
-import UserEdit from '../screens/User/UserEdit'
-import PostInfo from '../screens/Post/PostInfo'
-import CreateComment from '../screens/Post/CreateComment'
+import UserInfo from "../screens/User/UserInfo"
+import UserEdit from "../screens/User/UserEdit"
+import PostInfo from "../screens/Post/PostInfo"
+import CreateComment from "../screens/Post/CreateComment"
 import New from "../screens/New"
 
 const Tab = createBottomTabNavigator()
 const FeedStack = createNativeStackNavigator()
 
-function FeedStackScreen(){
-    return (
-        <FeedStack.Navigator>
-            <FeedStack.Group>
-                <FeedStack.Screen name="Feed" component={Feed} />
-                <FeedStack.Screen name="UserInfo" component={UserInfo} />
-                <FeedStack.Screen name="PostInfo" component={PostInfo} />
-            </FeedStack.Group>
+function FeedStackScreen() {
+  return (
+    <FeedStack.Navigator>
+      <FeedStack.Group>
+        <FeedStack.Screen name="Feed" component={Feed} />
+        <FeedStack.Screen name="UserInfo" component={UserInfo} />
+        <FeedStack.Screen name="PostInfo" component={PostInfo} />
+      </FeedStack.Group>
 
-            <FeedStack.Group screenOptions={{ presentation: 'modal' }}>
-                <FeedStack.Screen name="CreateComment" component={CreateComment} />
-                <FeedStack.Screen name="UserEdit" component={UserEdit} />
-            </FeedStack.Group>
-        </FeedStack.Navigator>
-    )
+      <FeedStack.Group screenOptions={{ presentation: "modal" }}>
+        <FeedStack.Screen name="CreateComment" component={CreateComment} />
+        <FeedStack.Screen name="UserEdit" component={UserEdit} />
+      </FeedStack.Group>
+    </FeedStack.Navigator>
+  )
 }
 
-export default function TabRoutes(){
-    const dispatch = useDispatch()
-    const user = useSelector((state: any) => state.userReducer)
-    const [logged, setLogged] = useState(false)
+export default function TabRoutes() {
+  const dispatch = useDispatch()
+  const user = useSelector((state: any) => state.userReducer)
+  const [logged, setLogged] = useState(false)
 
-    useEffect(()=>{
-        async function fetchData(){
-            try{
-                const token = await SecureStore.getItemAsync('userToken')
-                if(!token) return setLogged(false)
-                
-                const userResponse = await axios.get('http://192.168.100.80:3000/auth/user', {
-                    headers: { Authorization: `Bearer ${token}` },
-                })
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const isLogged = await SecureStore.getItemAsync("isLogged")
+        console.log("isLogged")
+        if (!isLogged) return setLogged(false)
+        else setLogged(true)
 
-                dispatch({ type: 'user', payload: {
-                    name: userResponse.data.user.name,
-                    id: userResponse.data.user._id,
-                    email: userResponse.data.user.email,
-                    bio: userResponse.data.user.bio,
-                    pfp: userResponse.data.user.profile_picture
-                } })
+        const userResponse = await axios.get(
+          "http://192.168.100.80:3000/auth/user"
+        )
 
-                setLogged(true)
-            }catch(error: any){
-                console.log(error)
-                setLogged(false)
-            }
-        }
+        dispatch({
+          type: "user",
+          payload: {
+            name: userResponse.data.user.name,
+            id: userResponse.data.user._id,
+            email: userResponse.data.user.email,
+            bio: userResponse.data.user.bio,
+            pfp: userResponse.data.user.profile_picture,
+          },
+        })
 
-        fetchData()
-    }, [user])
+        setLogged(true)
+      } catch (error: any) {
+        console.log(error)
+        setLogged(false)
+      }
+    }
 
-    if(!logged) return <AuthRoutes></AuthRoutes>
-    
-    return (
-        <Tab.Navigator screenOptions={{ headerShown: false }}>
-            <Tab.Screen
-                name="Main"
-                component={FeedStackScreen}
-                options={{
-                    tabBarIcon: ({ color, size }) =>
-                        <Feather
-                            name="home"
-                            color={color}
-                            size={size}
-                        />,
-                    tabBarLabel: 'Início'
-                }}
-            />
+    fetchData()
+  }, [user])
 
-            <Tab.Screen
-                name="New"
-                component={New}
-                options={{
-                    tabBarIcon: ({ color, size }) =>
-                        <Feather
-                            name="plus"
-                            color={color}
-                            size={size}
-                        />,
-                    tabBarLabel: 'Novo'
-                }}
-            />
+  if (!logged) return <AuthRoutes></AuthRoutes>
 
-            <Tab.Screen
-                name="User"
-                component={UserInfo}
-                initialParams={{ username: user.name }}
-                options={{
-                    tabBarIcon: ({ color, size }) =>
-                        <Feather
-                            name="user"
-                            color={color}
-                            size={size}
-                        />,
-                    tabBarLabel: 'Novo'
-                }}
-            />
-        </Tab.Navigator>
-    )
+  return (
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen
+        name="Main"
+        component={FeedStackScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="home" color={color} size={size} />
+          ),
+          tabBarLabel: "Início",
+        }}
+      />
+
+      <Tab.Screen
+        name="New"
+        component={New}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="plus" color={color} size={size} />
+          ),
+          tabBarLabel: "Novo",
+        }}
+      />
+
+      <Tab.Screen
+        name="User"
+        component={UserInfo}
+        initialParams={{ username: user.name }}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="user" color={color} size={size} />
+          ),
+          tabBarLabel: "Novo",
+        }}
+      />
+    </Tab.Navigator>
+  )
 }

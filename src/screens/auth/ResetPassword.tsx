@@ -2,35 +2,44 @@ import { useState } from "react"
 import axios from "axios"
 import { StyleSheet, Text, View, TextInput, Button } from "react-native"
 
-export default function ForgetPassword({ navigation }: any) {
-  const [email, setEmail] = useState("")
+export default function ResetPassword({ route }: any) {
+  const email = route.params.email || ""
+  const [form, setForm] = useState({ password: "", verificationCode: "" })
   const [loading, setLoading] = useState(false)
   const [errMsg, setErrMsg] = useState("")
 
   const handleForm = async () => {
     setLoading(true)
     try {
-      await axios.post("http://192.168.100.80:3000/auth/forget-password", {
+      await axios.post("http://192.168.100.80:3000/auth/reset-password", {
         email,
+        ...form,
       })
-
-      navigation.navigate("ResetPassword", { email })
     } catch (err: any) {
-      setErrMsg(err.response.data.msg)
+      setErrMsg(err.response.data.msg || "Error calling API")
     }
     setLoading(false)
   }
 
+  if (!email) setErrMsg("No email provided")
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.title}>Forget Password</Text>
+        <Text style={styles.title}>Reset Password</Text>
+        <Text style={styles.subtitle}>for {email}</Text>
 
-        <Text style={styles.label}>Email:</Text>
+        <Text style={styles.label}>Verification Code:</Text>
         <TextInput
-          placeholder="your email"
-          onChangeText={(text) => setEmail(text)}
+          placeholder="verification code here"
+          onChangeText={(text) => setForm({ ...form, verificationCode: text })}
         />
+
+        <Text style={styles.label}>New Password</Text>
+        <TextInput
+          placeholder="new password here"
+          onChangeText={(text) => setForm({ ...form, password: text })}
+        />
+
         <Button
           title="Send"
           onPress={() => handleForm()}
@@ -53,6 +62,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "bold",
+  },
+  subtitle: {
+    fontSize: 15,
+    marginBottom: 10,
   },
   label: {
     fontSize: 10,
