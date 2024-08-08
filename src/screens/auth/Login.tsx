@@ -27,8 +27,6 @@ export default function Login({ navigation }: any) {
      TODO: buy a domain and do the google auth stuff
     */
     if (event.url.includes("/auth/google/callback")) {
-      console.log(event)
-
       setWebViewVisible(false)
     }
   }
@@ -36,12 +34,10 @@ export default function Login({ navigation }: any) {
   const handleForm = async () => {
     setLoading(true)
     try {
-      const response = await axios.post(
+      const response: any = await axios.post(
         "http://192.168.1.174:3000/auth/login",
         form
       )
-
-      await SecureStore.setItemAsync("isLogged", "true")
 
       dispatch({
         type: "user",
@@ -52,6 +48,7 @@ export default function Login({ navigation }: any) {
         },
       })
     } catch (err: any) {
+      console.log(err)
       setErrMsg(err?.response?.data?.message || "Error calling API")
     }
     setLoading(false)

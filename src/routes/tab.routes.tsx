@@ -42,14 +42,17 @@ export default function TabRoutes() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const isLogged = await SecureStore.getItemAsync("isLogged")
-        console.log("isLogged")
-        if (!isLogged) return setLogged(false)
-        else setLogged(true)
-
         const userResponse = await axios.get(
-          "http://192.168.100.80:3000/auth/user"
+          "http://192.168.1.174:3000/auth/user"
         )
+
+        if (userResponse.status != 200) {
+          setLogged(false)
+          return
+        }
+
+        console.log("User response:")
+        console.log(userResponse.data)
 
         dispatch({
           type: "user",
@@ -64,13 +67,14 @@ export default function TabRoutes() {
 
         setLogged(true)
       } catch (error: any) {
-        console.log(error)
         setLogged(false)
+        console.log("Error fetching user data:  ")
+        console.log(error)
       }
     }
 
     fetchData()
-  }, [user])
+  }, [])
 
   if (!logged) return <AuthRoutes></AuthRoutes>
 
