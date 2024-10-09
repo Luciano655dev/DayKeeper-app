@@ -26,13 +26,7 @@ export default function Profile({ route, navigation }: any) {
           return setLoading(false)
         }
 
-        const token = await SecureStore.getItemAsync("userToken")
-        const response = await axios.get(
-          `http://192.168.1.174:3000/${username}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        )
+        const response = await axios.get(`/${username}`)
         setUserData({
           username: response.data.user.name,
           pfp: response.data.user.profile_picture.url,

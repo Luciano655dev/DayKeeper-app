@@ -4,16 +4,13 @@ import {
   Text,
   View,
   FlatList,
-  Button,
   ActivityIndicator,
 } from "react-native"
-import * as SecureStore from "expo-secure-store"
 import axios from "axios"
 import Tweet from "../components/Tweet"
-import { useSelector } from "react-redux"
+import DailyQuestion from "../components/DailyQuestion"
 
 export default function Feed() {
-  const user = useSelector((state: any) => state.userReducer)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [data, setData]: any = useState([])
@@ -24,13 +21,13 @@ export default function Feed() {
   const fetchData = async () => {
     setNewPostLoading(true)
     try {
-      const response = await axios.get(
-        `http://192.168.1.174:3000/search?page=${page}`
-      )
+      const postsResponse = await axios.get(`/search?page=${page}`, {
+        withCredentials: true,
+      })
 
-      setTotalPages(response.data.totalPages)
-      if (page == 1) setData(response.data.data)
-      else setData([...data, ...response.data.data])
+      setTotalPages(postsResponse?.data.totalPages)
+      if (page == 1) setData(postsResponse?.data.data)
+      else setData([...data, ...postsResponse?.data.data])
     } catch (error: any) {
       setErrMsg(error?.response?.data?.message || error.message)
     }
@@ -44,16 +41,6 @@ export default function Feed() {
 
   const handleAddPage = () => {
     if (page < totalPages) setPage(page + 1)
-  }
-
-  const handleReaction = async (username: String, posttitle: String) => {
-    try {
-      await axios.post(
-        `http://192.168.1.174:3000/${username}/${posttitle}/like`
-      )
-    } catch (error: any) {
-      console.log(error?.response?.data?.message || error.message)
-    }
   }
 
   if (loading)
@@ -80,12 +67,18 @@ export default function Feed() {
 
   return (
     <View style={{ flex: 1 }}>
+      <DailyQuestion />
       <FlatList
         style={styles.container}
         data={data}
         keyExtractor={({ _id }) => String(_id)}
         onEndReachedThreshold={0.1}
         onEndReached={handleAddPage}
+        ListHeaderComponent={
+          <View style={{ marginBottom: 100 }}>
+            <DailyQuestion />
+          </View>
+        }
         ListFooterComponent={<FooterList load={newPostLoading} />}
         refreshing={loading}
         onRefresh={() => {
@@ -93,20 +86,7 @@ export default function Feed() {
           setLoading(true)
           if (page == 1) fetchData()
         }}
-        renderItem={({ item }) => (
-          <Tweet
-            key={item._id}
-            username={item.user_info.name}
-            pfp={item.user_info.profile_picture.url}
-            title={item.title}
-            text={item.data}
-            files={item.files}
-            comments={item.comments}
-            likes={item.likes}
-            loggedUser={user}
-            handleReaction={handleReaction}
-          />
-        )}
+        renderItem={({ item }) => <Tweet item={item} />}
       />
     </View>
   )

@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux"
 import { useEffect, useState } from "react"
 import { Feather } from "@expo/vector-icons"
 import axios from "axios"
-import * as SecureStore from "expo-secure-store"
 import AuthRoutes from "./auth.routes"
 
 import Feed from "../screens/Feed"
@@ -38,21 +37,18 @@ export default function TabRoutes() {
   const dispatch = useDispatch()
   const user = useSelector((state: any) => state.userReducer)
   const [logged, setLogged] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const userResponse = await axios.get(
-          "http://192.168.1.174:3000/auth/user"
-        )
+        // prod: https://daykeeper-api.onrender.com
+        axios.defaults.baseURL = "http://192.168.1.174:3001"
+        axios.defaults.withCredentials = true
 
-        if (userResponse.status != 200) {
-          setLogged(false)
-          return
-        }
+        const userResponse = await axios.get("/auth/user")
 
-        console.log("User response:")
-        console.log(userResponse.data)
+        axios.defaults.headers.common["connect.sid"] = userResponse.data.token
 
         dispatch({
           type: "user",
@@ -68,15 +64,19 @@ export default function TabRoutes() {
         setLogged(true)
       } catch (error: any) {
         setLogged(false)
-        console.log("Error fetching user data:  ")
-        console.log(error)
+        console.log("User not logged in")
       }
+      setLoading(false)
     }
 
     fetchData()
-  }, [])
+  }, [user?.name])
 
-  if (!logged) return <AuthRoutes></AuthRoutes>
+  if (loading) {
+    console.log("loading...")
+    return <></>
+  }
+  if (!logged) return <></>
 
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>

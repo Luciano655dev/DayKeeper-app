@@ -1,4 +1,6 @@
 import { useState } from "react"
+import { Feather } from "@expo/vector-icons"
+import { useNavigation } from "@react-navigation/native"
 import {
   Image,
   Text,
@@ -7,45 +9,39 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native"
-import { Feather } from "@expo/vector-icons"
-import { useNavigation } from "@react-navigation/native"
+import axios from "axios"
 
 export default function Tweet(props: any) {
   let {
-    username,
-    title,
-    text,
-    files,
-    comments,
-    likes,
-    loggedUser,
-    handleReaction,
+    item: {
+      user_info: { name, profile_picture },
+      title,
+      data,
+      files,
+      userLiked,
+      likes,
+      userCommented,
+      comments,
+    },
   } = props
-  const pfp = props.pfp
 
-  const [updatedLikes, setUpdatedLikes] = useState(likes || [])
+  const [updatedLikes, setUpdatedLikes] = useState(likes)
+  const [updatedUserLiked, setUpdatedUserLiked] = useState(userLiked)
 
   const navigator: any = useNavigation()
-  const [loading, setLoading] = useState(false)
-
-  const userHasLiked = () => {
-    return (
-      updatedLikes.filter((userId: any) => userId == loggedUser.id).length == 0
-    )
-  }
 
   const handleLikeInput = async () => {
     try {
-      const userLiked = updatedLikes.includes(loggedUser.id)
-
-      userLiked
-        ? setUpdatedLikes(
-            updatedLikes.filter((userId: any) => userId != loggedUser.id)
-          )
-        : setUpdatedLikes([...updatedLikes, loggedUser.id])
+      if (updatedUserLiked) {
+        setUpdatedLikes(updatedLikes - 1)
+        setUpdatedUserLiked(false)
+      } else {
+        setUpdatedLikes(updatedLikes + 1)
+        setUpdatedUserLiked(true)
+      }
 
       try {
-        await handleReaction(username, title)
+        axios.post(`/${name}/${title}/like`)
       } catch (error) {
         console.log(error)
         setUpdatedLikes(updatedLikes)
@@ -59,20 +55,23 @@ export default function Tweet(props: any) {
     <View style={styles.container}>
       <Pressable
         onPress={() =>
-          navigator.navigate("PostInfo", { username, posttitle: title })
+          navigator.navigate("PostInfo", { username: name, posttitle: title })
         }
       >
         <View style={styles.tweetHeader}>
           <TouchableOpacity
-            onPress={() => navigator.navigate("UserInfo", { username })}
+            onPress={() => navigator.navigate("UserInfo", { username: name })}
           >
-            <Image style={styles.avatar} source={{ uri: pfp }} />
+            <Image
+              style={styles.avatar}
+              source={{ uri: profile_picture.url }}
+            />
           </TouchableOpacity>
-          <Text style={styles.author}>{username}</Text>
+          <Text style={styles.author}>{name}</Text>
           <Text style={styles.authorAt}>{title}</Text>
           <Text style={styles.authorAt}></Text>
         </View>
-        <Text style={styles.content}>{text}</Text>
+        <Text style={styles.content}>{data}</Text>
         <View style={styles.imageContainer}>
           {files.map((file: any) =>
             file.mimetype.split("/")[0] == "image" ? (
@@ -91,28 +90,33 @@ export default function Tweet(props: any) {
           <View style={styles.footerReactions}>
             <View
               style={
-                userHasLiked() ? styles.footerIcons : styles.selectedFooterIcon
+                updatedUserLiked
+                  ? styles.selectedFooterIcon
+                  : styles.footerIcons
               }
             >
               <TouchableOpacity
                 onPress={() => handleLikeInput()}
                 style={styles.button}
-                disabled={loading}
               >
                 <Feather name="heart" size={20} color="#999" />
-                <Text style={styles.textButton}>{updatedLikes.length}</Text>
+                <Text style={styles.textButton}>{updatedLikes}</Text>
               </TouchableOpacity>
             </View>
           </View>
 
-          <View style={styles.footerIcons}>
+          <View
+            style={
+              userCommented ? styles.selectedFooterIcon : styles.footerIcons
+            }
+          >
             <TouchableOpacity
               onPress={() =>
                 navigator.navigate("CreateComment", {
-                  username,
-                  pfp,
+                  username: name,
+                  pfp: profile_picture.url,
                   title,
-                  text,
+                  text: data,
                 })
               }
               style={styles.button}

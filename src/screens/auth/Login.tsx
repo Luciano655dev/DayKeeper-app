@@ -9,7 +9,6 @@ import {
 import { useState } from "react"
 import { useDispatch } from "react-redux"
 import { WebView } from "react-native-webview"
-import * as SecureStore from "expo-secure-store"
 import axios from "axios"
 
 export default function Login({ navigation }: any) {
@@ -34,10 +33,11 @@ export default function Login({ navigation }: any) {
   const handleForm = async () => {
     setLoading(true)
     try {
-      const response: any = await axios.post(
-        "http://192.168.1.174:3000/auth/login",
-        form
-      )
+      const response: any = await axios.post("/auth/login", form, {
+        withCredentials: true,
+      })
+
+      console.log(response.headers)
 
       dispatch({
         type: "user",
@@ -92,7 +92,7 @@ export default function Login({ navigation }: any) {
         />
         {isWebViewVisible && (
           <WebView
-            source={{ uri: "http://192.168.1.174:3000/auth/google" }}
+            source={{ uri: "/auth/google" }}
             onNavigationStateChange={handleNavigationStateChange}
             style={{ marginTop: 20, width: 400 }}
           />

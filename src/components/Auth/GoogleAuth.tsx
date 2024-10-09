@@ -1,7 +1,5 @@
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
-import { Button, View } from "react-native"
-import axios from "axios"
 import * as WebBrowser from "expo-web-browser"
 
 WebBrowser.maybeCompleteAuthSession()
