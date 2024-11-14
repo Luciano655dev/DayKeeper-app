@@ -1,3 +1,4 @@
+import { apiUrl } from "../../constants"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { useDispatch, useSelector } from "react-redux"
@@ -43,7 +44,7 @@ export default function TabRoutes() {
     async function fetchData() {
       try {
         // prod: https://daykeeper-api.onrender.com
-        axios.defaults.baseURL = "http://192.168.1.174:3001"
+        axios.defaults.baseURL = apiUrl
         axios.defaults.withCredentials = true
 
         const userResponse = await axios.get("/auth/user")
@@ -62,6 +63,7 @@ export default function TabRoutes() {
         })
 
         setLogged(true)
+        console.log("user logged")
       } catch (error: any) {
         setLogged(false)
         console.log("User not logged in")
@@ -76,7 +78,8 @@ export default function TabRoutes() {
     console.log("loading...")
     return <></>
   }
-  if (!logged) return <></>
+
+  if (!logged) return <AuthRoutes></AuthRoutes>
 
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>

@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View, Image, Button, FlatList } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import { useEffect, useState } from "react"
-import * as SecureStore from "expo-secure-store"
 import axios from "axios"
 
 export default function Profile({ route, navigation }: any) {
@@ -41,15 +40,19 @@ export default function Profile({ route, navigation }: any) {
   }, [route])
 
   const resetToken = async () => {
-    await SecureStore.setItemAsync("userToken", "")
-    dispatch({
-      type: "user",
-      payload: {
-        name: "",
-        id: "",
-        pfp: "",
-      },
-    })
+    // TODO change this when logout is fixed
+    try {
+      await axios.get("/auth/logout")
+    } catch {
+      dispatch(
+        dispatch({
+          type: "user",
+          payload: {
+            name: "",
+          },
+        })
+      )
+    }
   }
 
   if (loading)

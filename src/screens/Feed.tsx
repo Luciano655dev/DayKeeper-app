@@ -6,11 +6,14 @@ import {
   FlatList,
   ActivityIndicator,
 } from "react-native"
+import { useDispatch } from "react-redux"
 import axios from "axios"
 import Tweet from "../components/Tweet"
 import DailyQuestion from "../components/DailyQuestion"
 
 export default function Feed() {
+  const dispatch = useDispatch()
+
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [data, setData]: any = useState([])
@@ -29,6 +32,12 @@ export default function Feed() {
       if (page == 1) setData(postsResponse?.data.data)
       else setData([...data, ...postsResponse?.data.data])
     } catch (error: any) {
+      dispatch({
+        type: "user",
+        payload: {
+          name: null,
+        },
+      })
       setErrMsg(error?.response?.data?.message || error.message)
     }
     setNewPostLoading(false)
@@ -40,7 +49,8 @@ export default function Feed() {
   }, [page])
 
   const handleAddPage = () => {
-    if (page < totalPages) setPage(page + 1)
+    console.log(page)
+    if (page <= totalPages) setPage(page + 1)
   }
 
   if (loading)
