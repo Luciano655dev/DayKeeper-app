@@ -1,39 +1,38 @@
 {
   "expo": {
-    "name": "daykeeper-app",
-    "slug": "daykeeper-app",
+    "name": "Daykeeper",
+    "slug": "Daykeeper",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/Daykeeper-Icon-Blue.png",
     "scheme": "daykeeperapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.daykeeper-app"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/Daykeeper-SplashScreen.png",
+        "backgroundColor": "#6DB5FF"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.daykeeperapp"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/Daykeeper-Icon-Blue.png"
+    },
+    "splash": {
+      "image": "./assets/images/Daykeeper-SplashScreen.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#6DB5FF"
     },
     "plugins": [
       "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ]
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
